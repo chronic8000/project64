@@ -6,36 +6,36 @@
 
 namespace
 {
-    LRESULT CALLBACK LanguageComboProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR, DWORD_PTR)
+LRESULT CALLBACK LanguageComboProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR, DWORD_PTR)
+{
+    if (msg == WM_CTLCOLORLISTBOX || msg == WM_CTLCOLOREDIT || msg == WM_CTLCOLORSTATIC)
     {
-        if (msg == WM_CTLCOLORLISTBOX || msg == WM_CTLCOLOREDIT || msg == WM_CTLCOLORSTATIC)
-        {
-            HDC dc = (HDC)wParam;
-            SetTextColor(dc, GetSysColor(COLOR_WINDOWTEXT));
-            SetBkColor(dc, GetSysColor(COLOR_WINDOW));
-            return (LRESULT)GetSysColorBrush(COLOR_WINDOW);
-        }
-        return DefSubclassProc(hwnd, msg, wParam, lParam);
+        HDC dc = (HDC)wParam;
+        SetTextColor(dc, GetSysColor(COLOR_WINDOWTEXT));
+        SetBkColor(dc, GetSysColor(COLOR_WINDOW));
+        return (LRESULT)GetSysColorBrush(COLOR_WINDOW);
     }
-
-    void MakeLanguageComboReadable(HWND combo)
-    {
-        HMODULE themeLib = LoadLibraryW(L"uxtheme.dll");
-        if (themeLib != nullptr)
-        {
-            typedef HRESULT(WINAPI * SetWindowThemeFn)(HWND, LPCWSTR, LPCWSTR);
-            auto setWindowTheme = (SetWindowThemeFn)GetProcAddress(themeLib, "SetWindowTheme");
-            if (setWindowTheme != nullptr)
-            {
-                setWindowTheme(combo, L"", L"");
-            }
-            FreeLibrary(themeLib);
-        }
-        SetWindowSubclass(combo, LanguageComboProc, 1, 0);
-        SendMessage(combo, CB_SETMINVISIBLE, 10, 0);
-        SendMessage(combo, CB_SETTOPINDEX, 0, 0);
-    }
+    return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
+
+void MakeLanguageComboReadable(HWND combo)
+{
+    HMODULE themeLib = LoadLibraryW(L"uxtheme.dll");
+    if (themeLib != nullptr)
+    {
+        typedef HRESULT(WINAPI * SetWindowThemeFn)(HWND, LPCWSTR, LPCWSTR);
+        auto setWindowTheme = (SetWindowThemeFn)GetProcAddress(themeLib, "SetWindowTheme");
+        if (setWindowTheme != nullptr)
+        {
+            setWindowTheme(combo, L"", L"");
+        }
+        FreeLibrary(themeLib);
+    }
+    SetWindowSubclass(combo, LanguageComboProc, 1, 0);
+    SendMessage(combo, CB_SETMINVISIBLE, 10, 0);
+    SendMessage(combo, CB_SETTOPINDEX, 0, 0);
+}
+} // namespace
 
 WelcomeScreen::WelcomeScreen()
 {
